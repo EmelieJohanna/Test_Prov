@@ -14,6 +14,35 @@
 
 // Exempel på användning:
 
+import { useState, useEffect } from "react";
+
+function useFetchData(url) {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setTimeout(async () => {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error("Response not ok");
+          }
+          const result = await response.json();
+          setData(result);
+          setIsLoading(false);
+        }, 2000);
+      } catch (error) {
+        console.log("Error fetching data: ", error);
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+    return () => {};
+  }, [url]);
+  return { data, isLoading };
+}
+
 function UserList() {
   const { data, isLoading } = useFetchData(
     "https://jsonplaceholder.typicode.com/users"
@@ -30,7 +59,11 @@ function UserList() {
 }
 
 function App() {
-  return <div></div>;
+  return (
+    <div>
+      <UserList />
+    </div>
+  );
 }
 
 export default App;
